@@ -3,19 +3,19 @@
 Code repository for the exercise.
 
 ## Requirements
-* scanpy
 * pytorch
-* pathlib
-* scikit-misc
-* argparse
-* tqdm
-* numpy
+* scanpy
 * scikit-learn
+* scikit-misc
+* numpy
+* argparse
+* pathlib
+* tqdm
 
 ## Usage Notes
 ### Download the Data
 
-Data from "Spatial transcriptomics identifies pathological cell type niches in IPF" by [Mayr et al.](https://doi.org/10.1101/2023.12.13.571464) was used. 
+Data from "Spatial transcriptomics identifies pathological cell type niches in IPF" by [Mayr et al.](https://doi.org/10.1101/2023.12.13.571464) is used. 
 
 Download the data (.h5ad) from https://zenodo.org/records/10012934 and save it in the data folder.
 

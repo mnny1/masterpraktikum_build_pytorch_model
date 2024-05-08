@@ -3,6 +3,7 @@ from pathlib import Path
 
 #
 # make adata smaller by selecting top 1500 genes (otherwise my laptop blows) and split into trainval and test by samples (dataset has no batch effect)
+# test set consist of 1x Healthy patient, 1x IPF patient, 1x public databse. It is approx. 21% of the entire dataset
 #
 
 file_path = Path("/Users/mathias/Code/masterpraktikum_ssl/Preprocess_toyST/adata_vis_human_spatial_paper.h5ad")
