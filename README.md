@@ -17,7 +17,7 @@ Code repository for the exercise.
 
 Data from "Spatial transcriptomics identifies pathological cell type niches in IPF" by [Mayr et al.](https://doi.org/10.1101/2023.12.13.571464) was used. 
 
-Download the data from https://zenodo.org/records/10012934 and save it in the data folder.
+Download the data (.h5ad) from https://zenodo.org/records/10012934 and save it in the data folder.
 
 ### Run the Model
 1. Run `prepare_data.py` to reduce dataset size and generate trainval and test set.
