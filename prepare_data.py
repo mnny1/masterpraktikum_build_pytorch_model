@@ -1,8 +1,9 @@
 import scanpy as sc
 from pathlib import Path
-import hdf5plugin
 
-# make adata smaller by selecting top 1500 genes (otherwise my laptop blows) and split into trainval and test by samples (no batch effect occurs)
+#
+# make adata smaller by selecting top 1500 genes (otherwise my laptop blows) and split into trainval and test by samples (dataset has no batch effect)
+#
 
 file_path = Path("/Users/mathias/Code/masterpraktikum_ssl/Preprocess_toyST/adata_vis_human_spatial_paper.h5ad")
 adata = sc.read(file_path)

@@ -2,6 +2,7 @@ import random, os, torch
 import numpy as np
 from torch import nn
 
+
 def seed_all(seed):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -15,7 +16,7 @@ def seed_all(seed):
     return
 
 
-# custom early stopping, based on chosen metric
+# custom early stopping, based on chosen metric, works for minimizing metrics
 class EarlyStopping:
     def __init__(self, patience=5, delta=1e-6):
         self.patience = patience
@@ -52,11 +53,27 @@ class ClassificationModel(nn.Module):
     return x
 
 
-def save_model(model, encoder, epoch, num_classes, lr, lr_factor, save_path, fname):
+def get_model(in_features, num_classes):
+    model = ClassificationModel(input_dim=in_features, num_classes=num_classes)
+    return model
+
+
+def save_model(model, encoder, epoch, num_classes, in_features, lr, lr_factor, save_path, fname):
     save_dict = {"model_state_dict": model.state_dict(),
                  "encoder": encoder,
                  "num_classes": num_classes,
+                 "in_features": in_features,
                  "epoch": epoch,
                  "lr": lr,
                  "lr_scheduler_factor": lr_factor}
     torch.save(save_dict, save_path/f"{fname}.pth")
+
+
+def load_model(save_path, fname):
+    loaded_model = torch.load(
+        save_path/f"{fname}.pth", map_location=torch.device("cpu"))
+    num_classes = loaded_model["num_classes"]
+    in_features = loaded_model["in_features"]
+    model = get_model(in_features, num_classes)
+    model.load_state_dict(loaded_model["model_state_dict"])
+    return model

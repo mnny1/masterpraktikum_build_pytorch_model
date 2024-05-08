@@ -11,7 +11,7 @@ if __name__ == "__main__":
     upper_lr = 1e-3
     bs = 256
     np.random.seed(seed)
-    learning_rates = loguniform.rvs(lower_lr, upper_lr, size=1)
+    learning_rates = loguniform.rvs(lower_lr, upper_lr, size=3)
     param_grid = {'learning_rate': learning_rates}
     parameters = list(ParameterGrid(param_grid))
     for idx, val in enumerate(parameters):

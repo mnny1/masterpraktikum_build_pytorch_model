@@ -3,6 +3,7 @@ from sklearn.preprocessing import LabelEncoder
 import scanpy as sc
 import torch
 
+
 class SimpleDataset(Dataset):
     def __init__(self, data, labels_list):
         self.data = data
@@ -31,3 +32,10 @@ def get_data(file_path):
     labels = encoder.fit_transform(adata.obs["Niche_NMF"].to_numpy())
     labels_map = {label: encoded_label for label, encoded_label in zip(adata.obs["Niche_NMF"].to_numpy(), labels)}
     return torch.tensor(adata.X.toarray(), dtype=torch.float32), labels, labels_map
+
+
+def get_testloader(file_path, batch_size=256):
+    data, labels, labels_map = get_data(file_path)
+    test_set = SimpleDataset(data, labels)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False)
+    return test_loader

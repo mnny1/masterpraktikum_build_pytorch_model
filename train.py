@@ -6,7 +6,7 @@ from tqdm import tqdm
 from pathlib import Path
 from sklearn.model_selection import KFold
 from sklearn.metrics import f1_score
-from utils import ClassificationModel, EarlyStopping, seed_all, save_model
+from utils import EarlyStopping, seed_all, get_model, save_model
 from dataset import get_data, get_dataloaders
 
 
@@ -26,7 +26,7 @@ def train_epoch(train_loader, model, optimizer, criterion, epoch, device):
 
         running_loss += loss.item()
         train_l.set_postfix_str(f'[{epoch + 1}] loss: {running_loss:.3f}')
-    return np.mean(running_loss)
+    return running_loss
 
 
 def validate_batch(loader, model, criterion, device):
@@ -104,8 +104,8 @@ if __name__ == "__main__":
     args = create_train_parser()
 
     train_data = Path("data/adata_trainval_uncompressed.h5ad")
-    #model_save_path = Path("./models")
-    #model_save_path.mkdir(parents=True, exist_ok=True)
+    model_save_path = Path("./models")
+    model_save_path.mkdir(parents=True, exist_ok=True)
     log_path = Path("./logs")
     log_path.mkdir(parents=True, exist_ok=True)
     fname = f"{args.run_number}_{args.encoder}"
@@ -114,11 +114,12 @@ if __name__ == "__main__":
     total_loss = np.zeros(args.kfold)
     kfold = KFold(n_splits=args.kfold, shuffle=False)
     data, labels, labels_map = get_data(train_data)
+    best_model = [None, None]
 
     for fold, (train_idx, val_idx) in enumerate(kfold.split(data)):
         print(f"kfold: {fold}")
         train_loader, val_loader = get_dataloaders(data, labels, train_idx, val_idx, batch_size=args.batch_size)
-        model = ClassificationModel(input_dim=train_loader.dataset[0][0].shape[0], num_classes=len(labels_map))
+        model = get_model(in_features=train_loader.dataset[0][0].shape[0], num_classes=len(labels_map))
         early_stop = EarlyStopping(patience=args.es_patience)
         criterion = CrossEntropyLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
@@ -137,11 +138,22 @@ if __name__ == "__main__":
                 if early_stop.should_stop:
                     print(f"Stopped early at epoch: {epoch+1}")
                     total_loss[fold] = early_stop.best_score
-                    break
 
-        #save_model(model, args.encoder, epoch, len(labels_map), args.lr, args.lr_scheduler_factor, save_path=model_save_path, fname=fname)
+                    # module to find best model
+                    if fold == 0:
+                        best_model[0] = model
+                        best_model[1] = early_stop.best_score
+                    elif best_model[1] < early_stop.best_score:
+                        best_model[0] = model
+                        best_model[1] = early_stop.best_score
+                    
+                    break
+            
+    
+    save_model(best_model[0], args.encoder, epoch, len(labels_map), train_loader.dataset[0][0].shape[0], args.lr, args.lr_scheduler_factor, save_path=model_save_path, fname=fname)
     val_log.append([0, 0, 0, np.mean(total_loss), 0])
     val_log = np.asarray(val_log)
     np.savetxt(f"{str(log_path)}/{fname}.csv", val_log, delimiter=",", fmt=["%d", "%d", "%.5f", "%.5f", "%.5f"])
     
+    print(f"total_loss across all folds: {total_loss}")
     print(f"total validation loss: {np.mean(total_loss)}")
