@@ -15,12 +15,12 @@ Code repository for this exercise. A simple niche classifier for scRNA-seq data.
 ## Evaluation Results
 
 <p align="left">
-    <img src="data/Screenshot 2024-05-09 at 16.09.54.png" alt="pipeline" width="45%"/>
+    <img src="data/lossplot.png" alt="loss_plot" width="60%"/>
 </p>
 
 |              Model | F1_val | F1_test |
 |-------------------:|-------:|--------:|
-|            NicheNN | 0.938  |   0.914 |
+|            NicheNN | 0.915  |   0.914 |
 
 ## Usage Notes
 ### Download the Data
